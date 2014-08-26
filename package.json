@@ -1,0 +1,29 @@
+{
+  "name": "node-rob",
+  "version": "0.0.1",
+  "description": "Autosaving objects for redis",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/relekang/node-rob.git"
+  },
+  "keywords": [
+    "redis",
+    "autosave",
+    "autosaving",
+    "objects",
+    "datastore"
+  ],
+  "author": "Rolf Erik Lekang <me@rolflekang.com> (http://rolflekang.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/relekang/node-rob/issues"
+  },
+  "homepage": "https://github.com/relekang/node-rob",
+  "dependencies": {
+    "redis": "^0.12.1"
+  }
+}
