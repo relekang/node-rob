@@ -1,0 +1,96 @@
+import should
+import chai: expect
+import assert
+import redis
+
+import ../index: AutosaveObject
+
+r = redis.createClient()
+
+describe('AutosaveObject', () ->
+    testObject = null
+    beforeEach(() ->
+        testObject = new AutosaveObject()
+    )
+    afterEach((done) ->
+        r.flushall(done)    
+    )
+
+    it('should create a redis connection', () ->
+        expect(testObject.redis).to.be.ok
+    )
+
+    it('should have a hash key', () ->
+        expect(testObject.hashKey).to.be.ok
+    )
+
+    it('should create a key', () ->
+        expect(testObject.key).to.be.ok
+    )
+
+    it('should use keygenerator if defined', () ->
+        AutosaveObject.prototype.keyGenerator = () ->
+            return 'IceCream'
+        testObject = new AutosaveObject()
+        expect(testObject.key).to.equal('IceCream')
+        delete AutosaveObject.prototype.keyGenerator
+    )
+
+    it('should save when a field is set', (done) ->
+        r.hdel(testObject.hashKey, testObject.key)
+        testObject.set('quantity', 20)
+            .then(testObject.set('type', 'IceCream'))
+            .then(() ->
+                r.hget(testObject.hashKey, testObject.key, (err, res) ->
+                    storedData = JSON.parse(res)
+                    expect(storedData.quantity).to.equal(20)
+                    expect(storedData.type).to.equal('IceCream')
+                    done()
+                )
+            )
+    )
+
+    describe('.fetch()', () ->
+        beforeEach((done) ->
+            r.hmset(AutosaveObject.prototype.hashKey, 
+                'a', JSON.stringify({ type: 'IceCream' quantity: 20 }),
+                'b', JSON.stringify({ type: 'Chocolate' quantity: 1 }),
+                'c', JSON.stringify({ type: 'Lollipop' quantity: 2 }),
+                done
+            )
+        )
+
+        it('should fetch all from redis and call the callback', (done) ->
+            AutosaveObject.prototype.fetch(null, assertFetchAllCallback(done))
+        )
+
+        it('should fetch all from redis and resolve the promise', (done) ->
+            AutosaveObject.prototype.fetch(null).then(assertFetchAllCallback(done))
+        )
+
+        it('should fetch one from redis and call the callback', (done) ->
+            AutosaveObject.prototype.fetch('b', assertFetchSingleCallback(done))
+        )
+
+        it('should fetch one from redis and resolve the promise', (done) ->
+            AutosaveObject.prototype.fetch('b').then(assertFetchSingleCallback(done))
+        )
+
+        assertFetchAllCallback = (done) ->
+            return (result) ->
+                expect(result.length).to.equal(3)
+                expect(result[0].get('type')).to.equal('IceCream')
+                expect(result[0].get('quantity')).to.equal(20)
+                expect(result[1].get('type')).to.equal('Chocolate')
+                expect(result[1].get('quantity')).to.equal(1)
+                expect(result[2].get('type')).to.equal('Lollipop')
+                expect(result[2].get('quantity')).to.equal(2)
+                done()
+
+        assertFetchSingleCallback = (done) ->
+            return (result) ->
+                expect(result.get('type')).to.equal('Chocolate')
+                expect(result.get('quantity')).to.equal(1)
+                done()
+    )
+)

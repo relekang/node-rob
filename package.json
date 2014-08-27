@@ -24,6 +24,14 @@
   },
   "homepage": "https://github.com/relekang/node-rob",
   "dependencies": {
+    "q": "^1.0.1",
     "redis": "^0.12.1"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "coveralls": "^2.11.1",
+    "istanbul": "^0.3.0",
+    "mocha": "^1.21.4",
+    "should": "^4.0.4"
   }
 }

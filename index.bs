@@ -1,0 +1,55 @@
+import redis
+import q as Q
+export {
+    AutosaveObject: AutosaveObject
+}
+
+class AutosaveObject
+    attributes: {}
+    hashKey: 'autosaveobject'
+
+    init: (key, attributes) ->
+        @redis = redis.createClient()
+        @attributes = attributes or {}
+        if key
+            @key = key
+        elif @keyGenerator
+            @key = @keyGenerator()
+        else
+            @key = Date.now() + Math.floor(Math.random() * 1000)
+
+    get: (key) ->
+        return @attributes[key]
+
+    set: (key, value) ->
+        @attributes[key] = value
+        return @save()
+
+    save: () ->
+        result = Q.defer()
+        @redis.hset(@hashKey, @key, JSON.stringify(@attributes), result.resolve)
+        return result.promise
+
+    fetch: (id, callback) ->
+        r = @redis or redis.createClient()
+        result = Q.defer()
+
+        if id
+            r.hget(@hashKey, id, (err, res) ->
+                if err
+                    result.reject(err)
+                result.resolve(new AutosaveObject(id, JSON.parse(res)))
+                callback and callback(new AutosaveObject(id, JSON.parse(res)))
+            )
+        else
+            r.hgetall(@hashKey, (err, res) ->
+                if err
+                    result.reject(err)
+                output = []
+                for key in Object.keys(res)
+                    output.push(new AutosaveObject(key, JSON.parse(res[key])))
+                result.resolve(output)
+                callback and callback(output)
+            )
+
+        return result.promise
