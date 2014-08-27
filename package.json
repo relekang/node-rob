@@ -6,6 +6,11 @@
   "scripts": {
     "test": "make test"
   },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/relekang/node-rob.git"
@@ -28,6 +33,7 @@
     "redis": "^0.12.1"
   },
   "devDependencies": {
+    "bailey": "0.0.13",
     "chai": "^1.9.1",
     "coveralls": "^2.11.1",
     "istanbul": "^0.3.0",
