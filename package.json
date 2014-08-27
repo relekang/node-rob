@@ -1,5 +1,5 @@
 {
-  "name": "node-rob",
+  "name": "rob",
   "version": "0.0.1",
   "description": "Autosaving objects for redis",
   "main": "index.js",
