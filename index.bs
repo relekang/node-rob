@@ -1,5 +1,6 @@
 import redis
 import q as Q
+import underscore as _
 export {
     AutosaveObject: AutosaveObject
 }
@@ -27,7 +28,12 @@ class AutosaveObject
 
     save: () ->
         result = Q.defer()
-        @redis.hset(@hashKey, @key, JSON.stringify(@attributes), result.resolve)
+        @redis.hset(
+            @hashKey,
+            @key,
+            JSON.stringify(@attributes),
+            result.resolve
+        )
         return result.promise
 
     fetch: (id, callback) ->
@@ -53,3 +59,20 @@ class AutosaveObject
             )
 
         return result.promise
+
+AutosaveObject.extend = (protoProps, staticProps) ->
+    console.log(@)
+    child = () ->
+        return @@.apply(@, arguments)
+
+    _.extend(child, @, staticProps)
+
+    Surrogate = () ->
+        @constructor = child
+    Surrogate.prototype = @prototype
+    child.prototype = new Surrogate
+
+    if protoProps
+        _.extend(child.prototype, protoProps)
+
+    return child

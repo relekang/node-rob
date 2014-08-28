@@ -13,20 +13,28 @@ npm install --save rob
 
 ```javascript
 var AutosaveObject = require('rob').AutosaveObject;
-
-var rob = new AutosaveObject(null, {
-  name: 'Rob',
-  age: 30
+var Person = AutosaveObject.extend({
+  fullName: function () {
+    return this.firstName + this.lastName;
+  }
+  keyGenerator: function () {
+    // Optional custom key generator
+    return this.firstName;
+  }
+})
+var albus = new Person(null, {
+  firstName: 'Albus Percival Wulfric Brian',
+  lastName: 'Dumbledore'
 });
 
-rob.set('age', 31); // This will write the object to redis
-rob.get('name'); // returns 'Rob'
+albus.set('age', 116); // This will write the object to redis
+albus.get('lastName'); // returns 'Dumbledore'
+albus.fullName(); // returns 'Albus Percival Wulfric Brian Dumbledore'
 
-
-AutosaveObject.fetch().then(function (result) {
+Person.fetch().then(function (result) {
   // result will be a list containing an instance equal to rob above
 });
-AutosaveObject.fetch(rob.key).then(function (result) {
+Person.fetch(albus.key).then(function (result) {
   // result will be an instance equal to rob above
 });
 ```
@@ -35,4 +43,4 @@ AutosaveObject.fetch(rob.key).then(function (result) {
 Read the [tests](https://github.com/relekang/node-rob/blob/master/test/index.bs) or the [source](https://github.com/relekang/node-rob/blob/master/index.bs). More documentation is coming later..
 
 --------
-MIT © Rolf Erik Lekang 
+MIT © Rolf Erik Lekang

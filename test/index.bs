@@ -93,4 +93,29 @@ describe('AutosaveObject', () ->
                 expect(result.get('quantity')).to.equal(1)
                 done()
     )
+    describe('.extend()', () ->
+        Person = AutosaveObject.extend({
+            fullName: () ->
+                return @firstName + @lastName
+        }, {
+            create: () ->
+                return new Person()
+        })
+
+        it('should have a function extend', () ->
+            expect(AutosaveObject).to.be.ok
+        )
+
+        it('should extend the and leave the original intact', () ->
+            expect(AutosaveObject.prototype.fullName).to.be.undefined
+            expect(Person.prototype.fullName).to.be.ok
+            expect(AutosaveObject.create).to.be.undefined
+            expect(Person.create).to.be.ok
+        )
+
+        it('should have a working constructor', () ->
+            person = new Person(null, { name: 'Rob' })
+            expect(person.get('name')).to.equal('Rob')
+        )
+    )
 )

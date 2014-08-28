@@ -1,6 +1,6 @@
 {
   "name": "rob",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Autosaving objects for redis",
   "main": "index.js",
   "scripts": {
