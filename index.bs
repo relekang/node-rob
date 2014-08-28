@@ -61,7 +61,6 @@ class AutosaveObject
         return result.promise
 
 AutosaveObject.extend = (protoProps, staticProps) ->
-    console.log(@)
     child = () ->
         return @@.apply(@, arguments)
 
