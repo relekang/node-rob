@@ -1,6 +1,6 @@
 {
   "name": "rob",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Autosaving objects for redis",
   "main": "index.js",
   "scripts": {
@@ -30,7 +30,8 @@
   "homepage": "https://github.com/relekang/node-rob",
   "dependencies": {
     "q": "^1.0.1",
-    "redis": "^0.12.1"
+    "redis": "^0.12.1",
+    "underscore": "^1.7.0"
   },
   "devDependencies": {
     "bailey": "0.0.13",
