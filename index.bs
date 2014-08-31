@@ -36,21 +36,21 @@ class AutosaveObject
         )
         return result.promise
 
-    fetch: (id, callback) ->
+AutosaveObject.fetch = (id, callback) ->
         r = @redis or redis.createClient()
         result = Q.defer()
 
         if id
-            r.hget(@hashKey, id, (err, res) ->
-                if err
-                    result.reject(err)
+            r.hget(@prototype.hashKey, id, (err, res) ->
+                if err or res == null
+                    return result.reject(err)
                 result.resolve(new AutosaveObject(id, JSON.parse(res)))
                 callback and callback(new AutosaveObject(id, JSON.parse(res)))
             )
         else
-            r.hgetall(@hashKey, (err, res) ->
+            r.hgetall(@prototype.hashKey, (err, res) ->
                 if err
-                    result.reject(err)
+                    return result.reject(err)
                 output = []
                 for key in Object.keys(res)
                     output.push(new AutosaveObject(key, JSON.parse(res[key])))

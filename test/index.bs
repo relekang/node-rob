@@ -61,20 +61,21 @@ describe('AutosaveObject', () ->
         )
 
         it('should fetch all from redis and call the callback', (done) ->
-            AutosaveObject.prototype.fetch(null, assertFetchAllCallback(done))
+            AutosaveObject.fetch(null, assertFetchAllCallback(done))
         )
 
         it('should fetch all from redis and resolve the promise', (done) ->
-            AutosaveObject.prototype.fetch(null).then(assertFetchAllCallback(done))
+            AutosaveObject.fetch(null).then(assertFetchAllCallback(done))
         )
 
         it('should fetch one from redis and call the callback', (done) ->
-            AutosaveObject.prototype.fetch('b', assertFetchSingleCallback(done))
+            AutosaveObject.fetch('b', assertFetchSingleCallback(done))
         )
 
         it('should fetch one from redis and resolve the promise', (done) ->
-            AutosaveObject.prototype.fetch('b').then(assertFetchSingleCallback(done))
+            AutosaveObject.fetch('b').then(assertFetchSingleCallback(done))
         )
+
 
         assertFetchAllCallback = (done) ->
             return (result) ->
