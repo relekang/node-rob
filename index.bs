@@ -42,8 +42,10 @@ AutosaveObject.fetch = (id, callback) ->
 
         if id
             r.hget(@prototype.hashKey, id, (err, res) ->
-                if err or res == null
+                if err
                     return result.reject(err)
+                if res == null
+                    return result.reject('No object for key: #{id}')
                 result.resolve(new AutosaveObject(id, JSON.parse(res)))
                 callback and callback(new AutosaveObject(id, JSON.parse(res)))
             )

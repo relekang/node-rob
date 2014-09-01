@@ -76,6 +76,12 @@ describe('AutosaveObject', () ->
             AutosaveObject.fetch('b').then(assertFetchSingleCallback(done))
         )
 
+        it('should return reject the promise if there is no data for a key', (done) ->
+            AutosaveObject.fetch('d').fail((error) ->
+                expect(error).to.equal('No object for key: d')
+                done()
+            )
+        )
 
         assertFetchAllCallback = (done) ->
             return (result) ->
