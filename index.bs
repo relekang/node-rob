@@ -1,5 +1,5 @@
 import redis
-import q as Q
+import bluebird as Promise
 import underscore as _
 export {
     AutosaveObject: AutosaveObject
@@ -27,40 +27,42 @@ class AutosaveObject
         return @save()
 
     save: () ->
-        result = Q.defer()
-        @redis.hset(
-            @hashKey,
-            @key,
-            JSON.stringify(@attributes),
-            result.resolve
+        return new Promise((resolve, reject) ->
+            @@redis.hset(
+                @@hashKey,
+                @@key,
+                JSON.stringify(@@attributes),
+                (err, res) ->
+                    if err
+                        reject(err)
+                    resolve(res)
+            )
         )
-        return result.promise
 
 AutosaveObject.fetch = (id, callback) ->
         r = @redis or redis.createClient()
-        result = Q.defer()
+        return new Promise((resolve, reject) ->
 
-        if id
-            r.hget(@prototype.hashKey, id, (err, res) ->
-                if err
-                    return result.reject(err)
-                if res == null
-                    return result.reject('No object for key: #{id}')
-                result.resolve(new AutosaveObject(id, JSON.parse(res)))
-                callback and callback(new AutosaveObject(id, JSON.parse(res)))
-            )
-        else
-            r.hgetall(@prototype.hashKey, (err, res) ->
-                if err
-                    return result.reject(err)
-                output = []
-                for key in Object.keys(res)
-                    output.push(new AutosaveObject(key, JSON.parse(res[key])))
-                result.resolve(output)
-                callback and callback(output)
-            )
-
-        return result.promise
+            if id
+                r.hget(@@prototype.hashKey, id, (err, res) ->
+                    if err
+                        reject(err)
+                    if res == null
+                        reject('No object for key: #{id}')
+                    resolve(new AutosaveObject(id, JSON.parse(res)))
+                    callback and callback(new AutosaveObject(id, JSON.parse(res)))
+                )
+            else
+                r.hgetall(@@prototype.hashKey, (err, res) ->
+                    if err
+                        reject(err)
+                    output = []
+                    for key in Object.keys(res)
+                        output.push(new AutosaveObject(key, JSON.parse(res[key])))
+                    resolve(output)
+                    callback and callback(output)
+                )
+        )
 
 AutosaveObject.extend = (protoProps, staticProps) ->
     child = () ->

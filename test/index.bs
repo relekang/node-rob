@@ -2,6 +2,7 @@ import should
 import chai: expect
 import assert
 import redis
+import bluebird as Promise
 
 import ../index: AutosaveObject
 
@@ -13,7 +14,7 @@ describe('AutosaveObject', () ->
         testObject = new AutosaveObject()
     )
     afterEach((done) ->
-        r.flushall(done)    
+        r.flushall(done)
     )
 
     it('should create a redis connection', () ->
@@ -38,9 +39,10 @@ describe('AutosaveObject', () ->
 
     it('should save when a field is set', (done) ->
         r.hdel(testObject.hashKey, testObject.key)
-        testObject.set('quantity', 20)
-            .then(testObject.set('type', 'IceCream'))
-            .then(() ->
+        Promise.join(
+            testObject.set('quantity', 20),
+            testObject.set('type', 'IceCream'),
+            () ->
                 r.hget(testObject.hashKey, testObject.key, (err, res) ->
                     storedData = JSON.parse(res)
                     expect(storedData.quantity).to.equal(20)
@@ -52,7 +54,7 @@ describe('AutosaveObject', () ->
 
     describe('.fetch()', () ->
         beforeEach((done) ->
-            r.hmset(AutosaveObject.prototype.hashKey, 
+            r.hmset(AutosaveObject.prototype.hashKey,
                 'a', JSON.stringify({ type: 'IceCream' quantity: 20 }),
                 'b', JSON.stringify({ type: 'Chocolate' quantity: 1 }),
                 'c', JSON.stringify({ type: 'Lollipop' quantity: 2 }),
@@ -77,7 +79,7 @@ describe('AutosaveObject', () ->
         )
 
         it('should return reject the promise if there is no data for a key', (done) ->
-            AutosaveObject.fetch('d').fail((error) ->
+            AutosaveObject.fetch('d').catch((error) ->
                 expect(error).to.equal('No object for key: d')
                 done()
             )
