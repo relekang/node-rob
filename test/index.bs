@@ -127,4 +127,19 @@ describe('AutosaveObject', () ->
             expect(person.get('name')).to.equal('Rob')
         )
     )
+    describe('.toString()', () ->
+      
+      it('should not contain redis object', () ->
+          obj = new AutosaveObject()
+          expect(obj.toString()).to.not.contain('redis')
+      )
+
+      it('should contain attributes', () ->
+          obj = new AutosaveObject()
+          expect(obj.toString()).to.equal('{}')
+          obj.set('iceCream', true)
+          expect(obj.toString()).to.equal('{"iceCream":true}')
+      )
+
+    )
 )

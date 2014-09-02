@@ -38,6 +38,8 @@ class AutosaveObject
                     resolve(res)
             )
         )
+    toString: () ->
+        return JSON.stringify(@attributes)
 
 AutosaveObject.fetch = (id, callback) ->
         r = @redis or redis.createClient()
