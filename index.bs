@@ -1,6 +1,6 @@
 import redis
 import bluebird as Promise
-import underscore as _
+import lodash as _
 
 export {
     AutosaveObject: AutosaveObject
