@@ -1,6 +1,7 @@
 import redis
 import bluebird as Promise
 import underscore as _
+
 export {
     AutosaveObject: AutosaveObject
 }
@@ -38,11 +39,13 @@ class AutosaveObject
                     resolve(res)
             )
         )
+
     toString: () ->
         return JSON.stringify(@attributes)
 
 AutosaveObject.fetch = (id, callback) ->
         r = @redis or redis.createClient()
+        constructor = @
         return new Promise((resolve, reject) ->
 
             if id
@@ -51,8 +54,9 @@ AutosaveObject.fetch = (id, callback) ->
                         reject(err)
                     if res == null
                         reject('No object for key: #{id}')
-                    resolve(new AutosaveObject(id, JSON.parse(res)))
-                    callback and callback(new AutosaveObject(id, JSON.parse(res)))
+                    obj = new constructor(id, JSON.parse(res))
+                    resolve(obj)
+                    callback and callback(obj)
                 )
             else
                 r.hgetall(@@prototype.hashKey, (err, res) ->
@@ -60,7 +64,7 @@ AutosaveObject.fetch = (id, callback) ->
                         reject(err)
                     output = []
                     for key in Object.keys(res)
-                        output.push(new AutosaveObject(key, JSON.parse(res[key])))
+                        output.push(new constructor(key, JSON.parse(res[key])))
                     resolve(output)
                     callback and callback(output)
                 )
@@ -81,3 +85,4 @@ AutosaveObject.extend = (protoProps, staticProps) ->
         _.extend(child.prototype, protoProps)
 
     return child
+

@@ -85,23 +85,58 @@ describe('AutosaveObject', () ->
             )
         )
 
+        it('should resolve with correct object as instance', (done) ->
+            NewObject = AutosaveObject.extend({
+                answer: () ->
+                    return 42
+            })
+
+            NewObject.fetch('b', (instance) ->
+                expect(instance instanceof NewObject).to.be.ok
+                expect(instance.answer()).to.equal(42)
+                done()
+            )
+        )
+
+        it('should resolve with correct object as instance in fetch all', (done) ->
+            NewObject = AutosaveObject.extend({
+                answer: () ->
+                    return 42
+            })
+
+            NewObject.fetch(null, (instances) ->
+                expect(instances[0] instanceof NewObject).to.be.ok
+                expect(instances[0].answer()).to.equal(42)
+                expect(instances[1] instanceof NewObject).to.be.ok
+                expect(instances[1].answer()).to.equal(42)
+                expect(instances[2] instanceof NewObject).to.be.ok
+                expect(instances[2].answer()).to.equal(42)
+                done()
+            )
+        )
+
         assertFetchAllCallback = (done) ->
             return (result) ->
                 expect(result.length).to.equal(3)
+                expect(result[0] instanceof AutosaveObject).to.be.ok
                 expect(result[0].get('type')).to.equal('IceCream')
                 expect(result[0].get('quantity')).to.equal(20)
+                expect(result[1] instanceof AutosaveObject).to.be.ok
                 expect(result[1].get('type')).to.equal('Chocolate')
                 expect(result[1].get('quantity')).to.equal(1)
+                expect(result[2] instanceof AutosaveObject).to.be.ok
                 expect(result[2].get('type')).to.equal('Lollipop')
                 expect(result[2].get('quantity')).to.equal(2)
                 done()
 
         assertFetchSingleCallback = (done) ->
             return (result) ->
+                expect(result instanceof AutosaveObject).to.be.ok
                 expect(result.get('type')).to.equal('Chocolate')
                 expect(result.get('quantity')).to.equal(1)
                 done()
     )
+
     describe('.extend()', () ->
         Person = AutosaveObject.extend({
             fullName: () ->
@@ -127,6 +162,7 @@ describe('AutosaveObject', () ->
             expect(person.get('name')).to.equal('Rob')
         )
     )
+
     describe('.toString()', () ->
       
       it('should not contain redis object', () ->
