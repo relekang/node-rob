@@ -13,4 +13,11 @@ coveralls: test
 node_modules:
 	npm install
 
-.PHONY: parse watch test coveralls
+clean:
+	rm *.js
+	rm test/*.js
+
+publish: clean parse
+	npm publish
+
+.PHONY: parse watch test coveralls publish
